@@ -7,6 +7,30 @@ screen_height = 176
 black = (0, 0, 0, 255)
 white = (255, 255, 255, 255)
 
+def check_hitbox(dir, player_width, player_height, xpos, ypos, step_size, background_bump):
+	background_width, background_height = background_bump.get_rect().size
+	if dir == "up" and ypos - step_size >= 0:
+		for i in range(xpos, xpos + player_width):
+			if background_bump.get_at((i, ypos - step_size)) == black:
+				return False
+		return True
+	elif dir == "down" and ypos + player_height - 1 + step_size < background_height:
+		for i in range(xpos, xpos + player_width):
+			if background_bump.get_at((i, ypos + player_height - 1 + step_size)) == black:
+				return False
+		return True
+	elif dir == "left" and xpos - step_size >= 0:
+		for i in range(ypos, ypos + player_height):
+			if background_bump.get_at((xpos - step_size, i)) == black:
+				return False
+		return True
+	elif dir == "right" and xpos + player_width - 1 + step_size < background_width:
+		for i in range(ypos, ypos + player_height):
+			if background_bump.get_at((xpos + player_width - 1 + step_size, i)) == black:
+				return False
+		return True
+	return False
+
 def main():
 	pygame.init()
 	screen = pygame.display.set_mode((screen_width, screen_height))
@@ -26,6 +50,7 @@ def main():
 	player_width, player_height = player.get_rect().size
 	center_xpos = 112
 	center_ypos = 80
+	step_size = 2
 	
 	while running:
 		clock.tick(fps)
@@ -33,17 +58,17 @@ def main():
 		screen.fill((0, 0, 0))
 		
 		if keys[pygame.K_UP]:
-			if ypos - player_height >= 0 and background_bump.get_at((xpos, ypos - player_height)) == white:
-				ypos -= player_height
+			if check_hitbox("up", player_width, player_height, xpos, ypos, step_size, background_bump):
+				ypos -= step_size
 		if keys[pygame.K_DOWN]:
-			if ypos + player_height < background_height and background_bump.get_at((xpos, ypos + player_height)) == white:
-				ypos += player_height
+			if check_hitbox("down", player_width, player_height, xpos, ypos, step_size, background_bump):
+				ypos += step_size
 		if keys[pygame.K_LEFT]:
-			if xpos - player_width >= 0 and background_bump.get_at((xpos - player_width, ypos)) == white:
-				xpos -= player_width
+			if check_hitbox("left", player_width, player_height, xpos, ypos, step_size, background_bump):
+				xpos -= step_size
 		if keys[pygame.K_RIGHT]:
-			if xpos + player_width < background_width and background_bump.get_at((xpos + player_width, ypos)) == white:
-				xpos += player_width
+			if check_hitbox("right", player_width, player_height, xpos, ypos, step_size, background_bump):
+				xpos += step_size
 		
 		background_pos = (center_xpos - xpos, center_ypos - ypos)
 		screen.blit(background_bottom, background_pos)
@@ -51,10 +76,11 @@ def main():
 		screen.blit(background_top, background_pos)
 		screen.blit(hat, (center_xpos, center_ypos - player_height))
 		pygame.display.flip()
+		
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				running = False
-				print(clock.get_fps())
+				print("fps: " + str(clock.get_fps()))
 
 if __name__ == "__main__":
 	main()
