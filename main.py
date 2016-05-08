@@ -38,11 +38,11 @@ def main():
 	
 	background_bottom = pygame.image.load("./Images/Maps/Bottom/PalletTown.png")
 	player = pygame.image.load("./Images/Characters/Player.png")
-	player.set_colorkey((255, 255, 255))
+	player.set_colorkey(white)
 	background_top = pygame.image.load("./Images/Maps/Top/PalletTown.png")
-	background_top.set_colorkey((255, 255, 255))
+	background_top.set_colorkey(white)
 	hat = pygame.image.load("./Images/Characters/Hat.png")
-	hat.set_colorkey((255, 255, 255))
+	hat.set_colorkey(white)
 	background_bump = pygame.image.load("./Images/Maps/Bump/PalletTown.png")
 	xpos = 32
 	ypos = 32
@@ -55,7 +55,7 @@ def main():
 	while running:
 		clock.tick(fps)
 		keys = pygame.key.get_pressed()
-		screen.fill((0, 0, 0))
+		screen.fill(black)
 		
 		if keys[pygame.K_UP]:
 			if check_hitbox("up", player_width, player_height, xpos, ypos, step_size, background_bump):
@@ -70,11 +70,13 @@ def main():
 			if check_hitbox("right", player_width, player_height, xpos, ypos, step_size, background_bump):
 				xpos += step_size
 		
+		rects = []
 		background_pos = (center_xpos - xpos, center_ypos - ypos)
-		screen.blit(background_bottom, background_pos)
-		screen.blit(player, (center_xpos, center_ypos))
-		screen.blit(background_top, background_pos)
-		screen.blit(hat, (center_xpos, center_ypos - player_height))
+		rects.append(screen.blit(background_bottom, background_pos))
+		rects.append(screen.blit(player, (center_xpos, center_ypos)))
+		rects.append(screen.blit(background_top, background_pos))
+		rects.append(screen.blit(hat, (center_xpos, center_ypos - player_height)))
+		#pygame.display.update(rects)
 		pygame.display.flip()
 		
 		for event in pygame.event.get():
